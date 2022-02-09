@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { map } from 'rxjs';
 import { profile, profilerForm, result } from './profile.form';
-import { sortKey } from './utils/sort-nums.util';
+import { sort, sortKey } from './utils/sort-nums.util';
 import { sum } from './utils/sum.util';
 
 @Component({
@@ -12,16 +12,21 @@ import { sum } from './utils/sum.util';
 export class AppComponent {
   form = profilerForm();
 
-  fastestRender$ = this.form.valueChanges.pipe(
+  renders$ = this.form.valueChanges.pipe(
     map(data => 
       (data.profiles ?? [])
-        .map(({ title = '', results = [] }) => ({
+        .map(({ title = '', results = [] }, index) => ({
           totalTime: sum(results),
-          title
+          title,
+          index
         }))
-        .sort(sortKey('totalTime'))
+        .sort((a, b) => a.totalTime - b.totalTime)
     )
   )
+
+  fastestRender$ = this.renders$.pipe(
+    map(([ first ]) => first)
+  );
 
   ngOnInit() {
     console.log(this.form)
@@ -44,10 +49,10 @@ export class AppComponent {
   }
 
   addResultToProfile(profileIndex: number) {
-    this.profiles.controls[profileIndex].controls.results.push(result());
+    this.profiles.at(profileIndex).controls.results.push(result());
   }
 
   removeResultFromProfile(profileIndex: number, resultIndex: number) {
-    this.profiles.controls[profileIndex].controls.results.removeAt(resultIndex);
+    this.profiles.at(profileIndex).controls.results.removeAt(resultIndex);
   }
 }

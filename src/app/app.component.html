@@ -1,28 +1,129 @@
-<form [formGroup]="form">
-  <ng-container formArrayName="profiles">
-      <div class="wrapper" *ngFor="let profile of profileCtrls(); let profileIndex = index" [formGroupName]="profileIndex">
-        <input formControlName="title">
-        <textarea formControlName="description"></textarea>
-    
-        <ng-container formControlName="results" >
-          <section *ngFor="let result of profile.controls.results.controls; let resultIndex = index">
-            <input [formControl]="result" type="number">
-          </section>
-        </ng-container>
-      </div>
-  </ng-container>
-</form>
+<app-navigation>
+  <button mat-raised-button color="primary" (click)="addProfile()">
+    Add Case
+  </button>
+  <form [formGroup]="form">
+    <ng-container
+      formArrayName="profiles">
+      <mat-card
+        *ngFor="let profile of profileCtrls(); let profileIndex = index"
+        [formGroupName]="profileIndex"
+      >
+        <div class="card-summary">
+          <mat-chip-list aria-label="Render summary">
+            <mat-chip color="primary" selected>{{ ((profile.valueChanges | async)?.results ?? []) | sum }}ms</mat-chip>
+            <mat-chip
+              color="accent"
+              *ngIf="(fastestRender$ | async)?.index === profileIndex"
+              selected>Fastest</mat-chip
+            >
+          </mat-chip-list>
+        </div>
+        <div class="card-head">
+          <mat-card-title>{{
+            profile.controls.title.value || "&lt;enter title&gt;"
+          }}</mat-card-title>
 
-<hr>
+          <mat-card-subtitle>{{
+            profile.controls.description.value || "&lt;enter description&gt;"
+          }}</mat-card-subtitle>
 
-<div>
-  <h1>Fastest Formh</h1>
-  {{ (form.valueChanges | async) | json }}
-</div>
+          <button
+            mat-mini-fab
+            color="warn"
+            aria-label="Delete comparison"
+            (click)="removeProfile(profileIndex)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
 
-<hr>
+        <mat-form-field appearance="fill">
+          <mat-label>Title</mat-label>
+          <input
+            matInput
+            placeholder="When x is true"
+            formControlName="title"
+            [name]="'title' + profileIndex"
+            [id]="'title' + profileIndex"
+          />
+        </mat-form-field>
 
-<div>
-  <h1>Fastest Render</h1>
-  {{ (fastestRender$ | async) | json }}
-</div>
+        <mat-form-field appearance="fill">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            placeholder="An optional description"
+            formControlName="description"
+            [name]="'description' + profileIndex"
+            [id]="'description' + profileIndex"
+          >
+          </textarea>
+        </mat-form-field>
+
+        <fieldset>
+          <legend>Results</legend>
+          <div
+            class="result-set"
+            *ngFor="
+              let result of profile.controls.results.controls;
+              let resultIndex = index
+            "
+          >
+            <mat-form-field appearance="fill">
+              <mat-label>Render {{ resultIndex + 1 }}</mat-label>
+              <input
+                matInput
+                placeholder="200"
+                type="number"
+                [formControl]="result"
+                [name]="'result' + profileIndex + '-' + resultIndex"
+                [id]="'result' + profileIndex + '-' + resultIndex"
+              />
+              <span matSuffix>ms</span>
+            </mat-form-field>
+
+            <button
+              mat-mini-fab
+              color="warn"
+              aria-label="Delete comparison"
+              (click)="removeResultFromProfile(profileIndex, resultIndex)"
+            >
+              <mat-icon>remove</mat-icon>
+            </button>
+          </div>
+
+          <button
+            mat-mini-fab
+            color="accent"
+            aria-label="Add render result"
+            (click)="addResultToProfile(profileIndex)"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </fieldset>
+      </mat-card>
+    </ng-container>
+  </form>
+
+  <hr />
+
+  <div>
+    <h1>Form Values</h1>
+    {{ form.valueChanges | async | json }}
+  </div>
+
+  <hr />
+
+  <div>
+    <h1>Fastest Render</h1>
+    {{ fastestRender$ | async | json }}
+  </div>  
+  
+  <hr />
+
+  <div>
+    <h1>Fastest Render</h1>
+    {{ renders$ | async | json }}
+  </div>
+</app-navigation>
