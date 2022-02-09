@@ -11,10 +11,10 @@
       >
         <div class="card-summary">
           <mat-chip-list aria-label="Render summary">
-            <mat-chip color="primary" selected>{{ ((profile.valueChanges | async)?.results ?? []) | sum }}ms</mat-chip>
+            <mat-chip color="primary" selected>{{ ($any((profile.valueChanges | async))?.results ?? []) | sum }}ms</mat-chip>
             <mat-chip
               color="accent"
-              *ngIf="(fastestRender$ | async)?.index === profileIndex"
+              *ngIf="fastestRender?.index === profileIndex"
               selected>Fastest</mat-chip
             >
           </mat-chip-list>
@@ -117,13 +117,13 @@
 
   <div>
     <h1>Fastest Render</h1>
-    {{ fastestRender$ | async | json }}
+    {{ fastestRender | json }}
   </div>  
   
   <hr />
 
   <div>
     <h1>Fastest Render</h1>
-    {{ renders$ | async | json }}
+    <!-- {{ renders | json }} -->
   </div>
 </app-navigation>
