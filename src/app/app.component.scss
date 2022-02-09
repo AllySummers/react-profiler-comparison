@@ -58,3 +58,13 @@ fieldset {
 .card-summary {
   margin: 1rem 0;
 }
+
+mat-list-item {
+  mat-chip-list {
+    margin-right: 0.5rem;
+  }
+}
+
+mat-divider {
+  margin: 1rem 0;
+}

@@ -1,6 +1,6 @@
-//@ts-nocheck
 import { Component } from '@angular/core';
-import { profile, profilerForm, result } from './profile.form';
+import { map, startWith } from 'rxjs';
+import { profile, ProfilerForm, profilerForm, result } from './profile.form';
 import { sum } from './utils/sum.util';
 
 @Component({
@@ -11,16 +11,21 @@ import { sum } from './utils/sum.util';
 export class AppComponent {
   form = profilerForm();
 
+  renders$ =  this.form.valueChanges.pipe(
+    startWith({
+      profiles: [
+        {
+          title: '',
+          description: '',
+          results: [0]
+        }
+      ]
+    }),
+    map(data => this.getRenders(data as any))
+  )
+
   get renders() {
-    return this.form
-    .getRawValue()
-    .profiles
-    .map(({ title = '', results = [] }, index) => ({
-      totalTime: sum(results),
-      title,
-      index,
-    }))
-    .sort((a, b) => a.totalTime - b.totalTime);
+    return this.getRenders(this.form.getRawValue())
   }
 
   get fastestRender() {
@@ -49,5 +54,15 @@ export class AppComponent {
 
   removeResultFromProfile(profileIndex: number, resultIndex: number) {
     this.profiles.at(profileIndex).controls.results.removeAt(resultIndex);
+  }
+
+  getRenders(renders: ProfilerForm) {
+    return renders.profiles
+      .map(({ title = '', results = [] }, index) => ({
+        totalTime: sum(results),
+        title,
+        index,
+      }))
+      .sort((a, b) => a.totalTime - b.totalTime);
   }
 }

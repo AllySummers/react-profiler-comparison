@@ -1,4 +1,15 @@
 <app-navigation>
+  <mat-list>
+    <mat-list-item *ngFor="let render of renders$ | async; let index = index">
+      <mat-chip-list aria-label="Render summary">
+        <mat-chip color="primary" selected>{{ render.totalTime }}ms</mat-chip>
+      </mat-chip-list>
+      {{ render.title || "&lt;enter title&gt;" }}
+    </mat-list-item>
+  </mat-list>
+
+  <mat-divider></mat-divider>
+
   <button mat-raised-button color="primary" (click)="addProfile()">
     Add Case
   </button>
@@ -11,7 +22,7 @@
       >
         <div class="card-summary">
           <mat-chip-list aria-label="Render summary">
-            <mat-chip color="primary" selected>{{ ($any((profile.valueChanges | async))?.results ?? []) | sum }}ms</mat-chip>
+            <mat-chip color="primary" selected>{{ ((profile.valueChanges | async)?.results ?? []) | sum }}ms</mat-chip>
             <mat-chip
               color="accent"
               *ngIf="fastestRender?.index === profileIndex"
@@ -76,6 +87,7 @@
                 matInput
                 placeholder="200"
                 type="number"
+                min="0"
                 [formControl]="result"
                 [name]="'result' + profileIndex + '-' + resultIndex"
                 [id]="'result' + profileIndex + '-' + resultIndex"
@@ -123,7 +135,15 @@
   <hr />
 
   <div>
-    <h1>Fastest Render</h1>
-    <!-- {{ renders | json }} -->
+    <h1>Render</h1>
+    {{ renders | json }}
   </div>
+
+<hr />
+
+  <div>
+    <h1>Render Async</h1>
+    {{ renders$ | async | json }}
+  </div>
+
 </app-navigation>

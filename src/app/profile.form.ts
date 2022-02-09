@@ -16,7 +16,7 @@ export const profilerForm = () => new FormGroup({
   ])
 })
 
-export type ProfilerForm = ReturnType<typeof profilerForm>['getRawValue'];
+export type ProfilerForm = ReturnType<ReturnType<typeof profilerForm>['getRawValue']>;
 
 export interface Profile {
   title: string;
