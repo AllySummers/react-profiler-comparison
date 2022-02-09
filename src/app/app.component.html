@@ -117,33 +117,4 @@
       </mat-card>
     </ng-container>
   </form>
-
-  <hr />
-
-  <div>
-    <h1>Form Values</h1>
-    {{ form.valueChanges | async | json }}
-  </div>
-
-  <hr />
-
-  <div>
-    <h1>Fastest Render</h1>
-    {{ fastestRender | json }}
-  </div>  
-  
-  <hr />
-
-  <div>
-    <h1>Render</h1>
-    {{ renders | json }}
-  </div>
-
-<hr />
-
-  <div>
-    <h1>Render Async</h1>
-    {{ renders$ | async | json }}
-  </div>
-
 </app-navigation>
