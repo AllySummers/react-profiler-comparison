@@ -1,0 +1,28 @@
+<form [formGroup]="form">
+  <ng-container formArrayName="profiles">
+      <div class="wrapper" *ngFor="let profile of profileCtrls(); let profileIndex = index" [formGroupName]="profileIndex">
+        <input formControlName="title">
+        <textarea formControlName="description"></textarea>
+    
+        <ng-container formControlName="results" >
+          <section *ngFor="let result of profile.controls.results.controls; let resultIndex = index">
+            <input [formControl]="result" type="number">
+          </section>
+        </ng-container>
+      </div>
+  </ng-container>
+</form>
+
+<hr>
+
+<div>
+  <h1>Fastest Formh</h1>
+  {{ (form.valueChanges | async) | json }}
+</div>
+
+<hr>
+
+<div>
+  <h1>Fastest Render</h1>
+  {{ (fastestRender$ | async) | json }}
+</div>
