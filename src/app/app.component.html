@@ -1,4 +1,8 @@
 <app-navigation>
+  <button type="button" mat-raised-button color="warn" (click)="resetForm()" class="align-center">
+    Delete All
+  </button>
+
   <mat-list>
     <mat-list-item *ngFor="let render of renders$ | async; let index = index">
       <mat-chip-list aria-label="Render summary">
@@ -10,12 +14,12 @@
 
   <mat-divider class="top-divider"></mat-divider>
 
-  <button mat-raised-button color="primary" (click)="addProfile()">
+  <button type="button" mat-raised-button color="primary" (click)="addProfile()">
     Add Case
   </button>
   <form [formGroup]="form">
     <ng-container formArrayName="profiles">
-      <mat-card *ngFor="let profile of profileCtrls(); let profileIndex = index" [formGroupName]="profileIndex">
+      <mat-card *ngFor="let profile of profileCtrls; let profileIndex = index" [formGroupName]="profileIndex">
         <div class="card-summary">
           <mat-chip-list aria-label="Render summary">
             <mat-chip color="primary" selected>
@@ -33,29 +37,22 @@
             {{ profile.controls.description.value || "&lt;enter description&gt;" }}
           </mat-card-subtitle>
 
-          <button mat-mini-fab color="warn" aria-label="Delete comparison" (click)="removeProfile(profileIndex)">
+          <button type="button" mat-mini-fab color="warn" aria-label="Delete comparison"
+            (click)="removeProfile(profileIndex)">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
 
         <mat-form-field appearance="fill">
           <mat-label>Title</mat-label>
-          <input 
-            matInput 
-            placeholder="When x is true" 
-            formControlName="title" 
-            [name]="'title' + profileIndex"
+          <input matInput placeholder="When x is true" formControlName="title" [name]="'title' + profileIndex"
             [id]="'title' + profileIndex" />
         </mat-form-field>
 
         <mat-form-field appearance="fill">
           <mat-label>Description</mat-label>
-          <textarea 
-            matInput 
-            placeholder="An optional description" 
-            formControlName="description"
-            [name]="'description' + profileIndex" 
-            [id]="'description' + profileIndex">
+          <textarea matInput placeholder="An optional description" formControlName="description"
+            [name]="'description' + profileIndex" [id]="'description' + profileIndex">
           </textarea>
         </mat-form-field>
 
@@ -70,52 +67,56 @@
               ">
               <mat-form-field appearance="fill">
                 <mat-label>Render {{ resultIndex + 1 }}</mat-label>
-                <input 
-                  matInput 
-                  placeholder="200" 
-                  type="number" 
-                  min="0" 
-                  [formControl]="result"
+                <input matInput placeholder="200" type="number" min="0" [formControl]="result"
                   [name]="'result' + profileIndex + '-' + resultIndex"
                   [id]="'result' + profileIndex + '-' + resultIndex" />
                 <span matSuffix>ms</span>
               </mat-form-field>
-              <button 
-                mat-mini-fab 
-                color="warn" 
-                aria-label="Delete render result"
-                (click)="removeResultFromSet(profileIndex, setIndex, resultIndex)">
+              <button type="button" mat-mini-fab color="warn" aria-label="Delete render result"
+                (click)="removeRenderFromSet(profileIndex, setIndex, resultIndex)">
                 <mat-icon>remove</mat-icon>
               </button>
 
             </div>
 
             <div class="result-actions">
-              <button 
-                mat-mini-fab 
-                color="accent" 
-                aria-label="Add render result"
-                (click)="addResultToSet(profileIndex, setIndex)" class="add-result-btn">
+              <button type="button" mat-mini-fab color="accent" aria-label="Add render result"
+                (click)="addRenderToSet(profileIndex, setIndex)" class="add-result-btn">
                 <mat-icon>add</mat-icon>
               </button>
-              <button 
-                mat-raised-button 
-                color="warn" 
-                (click)="removeResultSet(profileIndex, setIndex)"
+              <button type="button" mat-raised-button color="warn" (click)="removeResultSet(profileIndex, setIndex)"
                 class="remove-set-btn">
                 Remove Set
               </button>
             </div>
           </fieldset>
         </div>
-        <button 
-          mat-raised-button 
-          color="primary" 
-          (click)="addResultSet(profileIndex)" 
+        <button type="button" mat-raised-button color="primary" (click)="addResultSet(profileIndex)"
           class="add-set-btn">
           Add Set
         </button>
       </mat-card>
     </ng-container>
   </form>
+
+  <mat-divider class="top-divider"></mat-divider>
+
+  <mat-expansion-panel hideToggle>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Edit or view form value
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-form-field appearance="fill">
+      <mat-label>Form Value</mat-label>
+      <textarea [rows]="10" matInput placeholder="An optional description" [formControl]="textForm" name="update-form"
+        id="update-form">
+    </textarea>
+    </mat-form-field>
+    <button type="button" mat-raised-button color="primary" (click)="loadFromForm()" class="align-center">
+      Update Form
+    </button>
+  </mat-expansion-panel>
+
+
 </app-navigation>
