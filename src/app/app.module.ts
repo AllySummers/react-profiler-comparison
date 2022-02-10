@@ -16,13 +16,17 @@ import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { SumPipe } from './sum.pipe';
+import { AveragePipe } from './average.pipe';
+import { SumArrayPipe } from './sum-array.pipe';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     NavigationComponent,
-    SumPipe
+    SumPipe,
+    AveragePipe,
+    SumArrayPipe,
   ],
   imports: [
     BrowserModule,

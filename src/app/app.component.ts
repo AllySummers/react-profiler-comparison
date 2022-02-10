@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { map, startWith } from 'rxjs';
-import { profile, ProfilerForm, profilerForm, result } from './profile.form';
+import { profile, ProfilerForm, profilerForm, result, resultSet } from './profile.form';
+import { average } from './utils/average.util';
 import { sum } from './utils/sum.util';
 
 @Component({
@@ -17,7 +18,11 @@ export class AppComponent {
         {
           title: '',
           description: '',
-          results: [0]
+          results: [
+            [
+              0
+            ]
+          ]
         }
       ]
     }),
@@ -48,18 +53,28 @@ export class AppComponent {
     this.profiles.removeAt(index);
   }
 
-  addResultToProfile(profileIndex: number) {
-    this.profiles.at(profileIndex).controls.results.push(result());
+  addResultSet(profileIndex: number) {
+    this.profiles.at(profileIndex).controls.results.push(resultSet());
   }
 
-  removeResultFromProfile(profileIndex: number, resultIndex: number) {
-    this.profiles.at(profileIndex).controls.results.removeAt(resultIndex);
+  removeResultSet(profileIndex: number, setIndex: number) {
+    this.profiles.at(profileIndex).controls.results.removeAt(setIndex);
+  }
+
+  addResultToSet(profileIndex: number, setIndex: number) {
+    this.profiles.at(profileIndex).controls.results.at(setIndex).push(result());
+  }
+
+  removeResultFromSet(profileIndex: number, setIndex: number, resultIndex: number) {
+    this.profiles.at(profileIndex).controls.results.at(setIndex).removeAt(resultIndex);
   }
 
   getRenders(renders: ProfilerForm) {
     return renders.profiles
       .map(({ title = '', results = [] }, index) => ({
-        totalTime: sum(results),
+        totalTime: average(
+          results.map(sum)
+        ),
         title,
         index,
       }))

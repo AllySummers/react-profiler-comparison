@@ -2,11 +2,15 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 export const result = () => new FormControl(0, { initialValueIsDefault: true });
 
+export const resultSet = () => new FormArray([
+  result()
+]);
+
 export const profile = () => new FormGroup({
   title: new FormControl('', {initialValueIsDefault: true}),
   description: new FormControl('', {initialValueIsDefault: true}),
   results: new FormArray([
-    result()
+    resultSet()
   ])
 });
 
@@ -21,5 +25,5 @@ export type ProfilerForm = ReturnType<ReturnType<typeof profilerForm>['getRawVal
 export interface Profile {
   title: string;
   description: string;
-  results: Array<number>;
+  results: Array<Array<number>>;
 }

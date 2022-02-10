@@ -2,118 +2,119 @@
   <mat-list>
     <mat-list-item *ngFor="let render of renders$ | async; let index = index">
       <mat-chip-list aria-label="Render summary">
-        <mat-chip color="primary" selected>{{ render.totalTime }}ms</mat-chip>
+        <mat-chip color="primary" selected>{{ render.totalTime | number: '1.0-0' }}ms</mat-chip>
       </mat-chip-list>
       {{ render.title || "&lt;enter title&gt;" }}
     </mat-list-item>
   </mat-list>
 
-  <mat-divider></mat-divider>
+  <mat-divider class="top-divider"></mat-divider>
 
   <button mat-raised-button color="primary" (click)="addProfile()">
     Add Case
   </button>
   <form [formGroup]="form">
-    <ng-container
-      formArrayName="profiles">
-      <mat-card
-        *ngFor="let profile of profileCtrls(); let profileIndex = index"
-        [formGroupName]="profileIndex"
-      >
+    <ng-container formArrayName="profiles">
+      <mat-card *ngFor="let profile of profileCtrls(); let profileIndex = index" [formGroupName]="profileIndex">
         <div class="card-summary">
           <mat-chip-list aria-label="Render summary">
-            <mat-chip color="primary" selected>{{ ((profile.valueChanges | async)?.results ?? []) | sum }}ms</mat-chip>
-            <mat-chip
-              color="accent"
-              *ngIf="fastestRender?.index === profileIndex"
-              selected>Fastest</mat-chip
-            >
+            <mat-chip color="primary" selected>
+              {{ (profile.value.results ?? []) | sumArray | average | number: '1.0-0' }}ms Average
+            </mat-chip>
+            <mat-chip color="accent" *ngIf="fastestRender?.index === profileIndex" selected>Fastest</mat-chip>
           </mat-chip-list>
         </div>
         <div class="card-head">
-          <mat-card-title>{{
-            profile.controls.title.value || "&lt;enter title&gt;"
-          }}</mat-card-title>
+          <mat-card-title>
+            {{ profile.controls.title.value || "&lt;enter title&gt;" }}
+          </mat-card-title>
 
-          <mat-card-subtitle>{{
-            profile.controls.description.value || "&lt;enter description&gt;"
-          }}</mat-card-subtitle>
+          <mat-card-subtitle>
+            {{ profile.controls.description.value || "&lt;enter description&gt;" }}
+          </mat-card-subtitle>
 
-          <button
-            mat-mini-fab
-            color="warn"
-            aria-label="Delete comparison"
-            (click)="removeProfile(profileIndex)"
-          >
+          <button mat-mini-fab color="warn" aria-label="Delete comparison" (click)="removeProfile(profileIndex)">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
 
         <mat-form-field appearance="fill">
           <mat-label>Title</mat-label>
-          <input
-            matInput
-            placeholder="When x is true"
-            formControlName="title"
+          <input 
+            matInput 
+            placeholder="When x is true" 
+            formControlName="title" 
             [name]="'title' + profileIndex"
-            [id]="'title' + profileIndex"
-          />
+            [id]="'title' + profileIndex" />
         </mat-form-field>
 
         <mat-form-field appearance="fill">
           <mat-label>Description</mat-label>
-          <textarea
-            matInput
-            placeholder="An optional description"
+          <textarea 
+            matInput 
+            placeholder="An optional description" 
             formControlName="description"
-            [name]="'description' + profileIndex"
-            [id]="'description' + profileIndex"
-          >
+            [name]="'description' + profileIndex" 
+            [id]="'description' + profileIndex">
           </textarea>
         </mat-form-field>
 
-        <fieldset>
-          <legend>Results</legend>
-          <div
-            class="result-set"
-            *ngFor="
-              let result of profile.controls.results.controls;
-              let resultIndex = index
-            "
-          >
-            <mat-form-field appearance="fill">
-              <mat-label>Render {{ resultIndex + 1 }}</mat-label>
-              <input
-                matInput
-                placeholder="200"
-                type="number"
-                min="0"
-                [formControl]="result"
-                [name]="'result' + profileIndex + '-' + resultIndex"
-                [id]="'result' + profileIndex + '-' + resultIndex"
-              />
-              <span matSuffix>ms</span>
-            </mat-form-field>
+        <h2>Result Sets</h2>
 
-            <button
-              mat-mini-fab
-              color="warn"
-              aria-label="Delete comparison"
-              (click)="removeResultFromProfile(profileIndex, resultIndex)"
-            >
-              <mat-icon>remove</mat-icon>
-            </button>
-          </div>
+        <div class="result-sets">
+          <fieldset *ngFor="let set of profile.controls.results.controls; let setIndex = index; let lastSet = last">
+            <legend>Results {{ setIndex + 1 }}</legend>
+            <div class="result-set" *ngFor="
+                let result of set.controls;
+                let resultIndex = index
+              ">
+              <mat-form-field appearance="fill">
+                <mat-label>Render {{ resultIndex + 1 }}</mat-label>
+                <input 
+                  matInput 
+                  placeholder="200" 
+                  type="number" 
+                  min="0" 
+                  [formControl]="result"
+                  [name]="'result' + profileIndex + '-' + resultIndex"
+                  [id]="'result' + profileIndex + '-' + resultIndex" />
+                <span matSuffix>ms</span>
+              </mat-form-field>
+              <button 
+                mat-mini-fab 
+                color="warn" 
+                aria-label="Delete render result"
+                (click)="removeResultFromSet(profileIndex, setIndex, resultIndex)">
+                <mat-icon>remove</mat-icon>
+              </button>
 
-          <button
-            mat-mini-fab
-            color="accent"
-            aria-label="Add render result"
-            (click)="addResultToProfile(profileIndex)"
-          >
-            <mat-icon>add</mat-icon>
-          </button>
-        </fieldset>
+            </div>
+
+            <div class="result-actions">
+              <button 
+                mat-mini-fab 
+                color="accent" 
+                aria-label="Add render result"
+                (click)="addResultToSet(profileIndex, setIndex)" class="add-result-btn">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button 
+                mat-raised-button 
+                color="warn" 
+                (click)="removeResultSet(profileIndex, setIndex)"
+                class="remove-set-btn">
+                Remove Set
+              </button>
+            </div>
+          </fieldset>
+        </div>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="addResultSet(profileIndex)" 
+          class="add-set-btn">
+          Add Set
+        </button>
       </mat-card>
     </ng-container>
   </form>
